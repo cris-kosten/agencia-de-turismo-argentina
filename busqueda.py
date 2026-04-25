@@ -106,7 +106,7 @@ def buscar_x_fecha(dia, mes, año):
             resultados.append(paquete)
             
     if len(resultados) == 0:
-        print(f"No hay paquetes disponibles desde {dia:02d}/{mes:02d}/{año} ❌")
+        print(f"No hay paquetes disponibles desde {dia:02d}/{mes:02d}/{año} ")
         return
     
     print(f"\n{SEPARADOR} PAQUETE DESDE {dia:02d}/{mes:02d}/{año} {SEPARADOR}")
