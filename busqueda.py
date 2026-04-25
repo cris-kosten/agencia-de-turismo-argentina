@@ -3,6 +3,8 @@
 from datos import paquetes, IDX_DESTINO, IDX_PRECIO, IDX_FECHA, IDX_CUPOS_DISP
 import mostrar_paquete
 
+SEPARADOR = "=" *5
+DIAS_POR_MES = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 def normalizar_texto(texto):
     '''
     Convierte un texto a minusculas y remplaza las vocales con tilde por vocales sin tilde.
@@ -24,7 +26,6 @@ def buscar_x_destino(destino_a_buscar):
     muestra el resultado o un aviso si no encuentra nada
     '''
     
-    SEPARADOR = "=" * 5
     resultados = []
     for paquete in paquetes:
         if destino_a_buscar.lower() in paquete[IDX_DESTINO].lower():
@@ -46,8 +47,6 @@ def buscar_x_precio(precio_maximo):
     Se valida que el precio no sea negativo.
     Muestra los resultados por pantalla y/o avisa si no encuentra nada
     '''
-    
-    SEPARADOR = "=" * 5
     if precio_maximo < 0:
         print("El precio ingresado es negativo ❌.")
         return 
@@ -65,7 +64,6 @@ def buscar_x_precio(precio_maximo):
         mostrar_paquete(paquete)
 
 
-# busqueda por fechas 
 def convertir_fechas(fecha_srt):
     '''
     convierte una fecha de formato DD/MM/AAAA a AAAA/MM/DD
@@ -82,9 +80,6 @@ def validar_y_convertir_fecha(dia, mes, año):
     Devuelve el string AAAAMMDD para comparar, o None si la fecha
     es invalida 
     '''
-    
-    DIAS_POR_MES = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    #               -  E   F   M   A   M   J   J   A   S   O   N   D
     if año < 2024:
         print("El año ingresado no es valido ❌")
         return None
@@ -95,3 +90,23 @@ def validar_y_convertir_fecha(dia, mes, año):
         print("El dia ingresado no es valido ❌")
         return None
     return str(año) + str(mes).zfill(2) + str(dia).zfill(2)
+
+
+def buscar_con_cupos():
+    '''
+    Busca todos los paquetes que tengan al menos un cupo disponible
+    Si no hay paquetes disponibles, da aviso al usuario que los 
+    paquetes estan agotados.
+    '''
+    resultados = []
+    for paquete in paquetes:
+        if paquete[IDX_CUPOS_DISP] > 0:
+            resultados.append(paquete)
+            
+    if len(resultados) == 0:
+        print("Lo siento, no tenemos paquetes con cupos 🥹")
+        return
+    
+    print(f"\n{SEPARADOR} PAQUETES CON CUPOS DISPONIBLES {SEPARADOR}")
+    for paquete in resultados:
+        mostrar_paquete(paquete)
