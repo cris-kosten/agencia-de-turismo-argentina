@@ -1,10 +1,10 @@
 # MODULO DE BUSQUEDA DE PAQUETES TURISTICOS
 
 from datos import paquetes, IDX_DESTINO, IDX_PRECIO, IDX_FECHA, IDX_CUPOS_DISP
-import mostrar_paquete
-
+from datos import mostrar_paquete
 SEPARADOR = "=" *5
 DIAS_POR_MES = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 def normalizar_texto(texto):
     '''
     Convierte un texto a minusculas y remplaza las vocales con tilde por vocales sin tilde.
@@ -28,7 +28,7 @@ def buscar_x_destino(destino_a_buscar):
     
     resultados = []
     for paquete in paquetes:
-        if destino_a_buscar.lower() in paquete[IDX_DESTINO].lower():
+        if normalizar_texto(destino_a_buscar) in normalizar_texto(paquete[IDX_DESTINO]):
             resultados.append(paquete)
             
     if len(resultados) == 0:
@@ -58,6 +58,7 @@ def buscar_x_precio(precio_maximo):
             
     if len(resultados) == 0:
         print(f"No hay paquetes disponibles a partir del precio ${precio_maximo:.2f}")
+        return
         
     print(f"\n{SEPARADOR} PAQUETES HASTA ${precio_maximo:.2f} {SEPARADOR}")
     for paquete in resultados:
@@ -86,7 +87,7 @@ def validar_y_convertir_fecha(dia, mes, año):
     if mes <1 or mes >12:
         print("El mes ingresado no es valido ❌")
         return None
-    if dia <1 or dia >31:
+    if dia <1 or dia > DIAS_POR_MES[mes]:
         print("El dia ingresado no es valido ❌")
         return None
     return str(año) + str(mes).zfill(2) + str(dia).zfill(2)
