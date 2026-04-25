@@ -95,6 +95,10 @@ def validar_y_convertir_fecha(dia, mes, año):
 
 
 def buscar_x_fecha(dia, mes, año):
+    '''
+    busca por fecha mayor o igual al dato ingresado.
+    valida la fecha y muestra si no encuentra resultados.
+    '''
     
     fecha_buscada = validar_y_convertir_fecha(dia, mes, año)
     if fecha_buscada is None:
