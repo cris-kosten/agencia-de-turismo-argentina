@@ -51,15 +51,12 @@ def buscar_x_precio(precio_maximo):
         print("El precio ingresado es negativo .")
         return 
     
-    resultados = []
-    for paquete in paquetes:
-        if paquete[IDX_PRECIO] <= precio_maximo:
-            resultados.append(paquete)
-            
+    resultados = list(filter(lambda paquete: paquete[IDX_PRECIO] <= precio_maximo, paquetes))
+
     if len(resultados) == 0:
         print(f"No hay paquetes disponibles a partir del precio ${precio_maximo:.2f}")
         return
-        
+
     print(f"\n{SEPARADOR} PAQUETES HASTA ${precio_maximo:.2f} {SEPARADOR}")
     for paquete in resultados:
         mostrar_paquete(paquete)
@@ -99,7 +96,6 @@ def buscar_x_fecha(dia, mes, año):
     busca por fecha mayor o igual al dato ingresado.
     valida la fecha y muestra si no encuentra resultados.
     '''
-    
     fecha_buscada = validar_y_convertir_fecha(dia, mes, año)
     if fecha_buscada is None:
         return
@@ -108,7 +104,8 @@ def buscar_x_fecha(dia, mes, año):
     for paquete in paquetes:
         if convertir_fechas(paquete[IDX_FECHA]) >= fecha_buscada:
             resultados.append(paquete)
-            
+    # resultados = list(filter(lambda paquete: paquete[IDX_FECHA] >= fecha_buscada, paquetes))
+
     if len(resultados) == 0:
         print(f"No hay paquetes disponibles desde {dia:02d}/{mes:02d}/{año} ")
         return
@@ -123,15 +120,12 @@ def buscar_con_cupos():
     Si no hay paquetes disponibles, da aviso al usuario que los 
     paquetes estan agotados.
     '''
-    resultados = []
-    for paquete in paquetes:
-        if paquete[IDX_CUPOS_DISP] > 0:
-            resultados.append(paquete)
-            
+    resultados = [paquete for paquete in paquetes if paquete[IDX_CUPOS_DISP] >0 ]
+
     if len(resultados) == 0:
         print("Lo siento, no tenemos paquetes con cupos ")
         return
-    
+
     print(f"\n{SEPARADOR} PAQUETES CON CUPOS DISPONIBLES {SEPARADOR}")
     for paquete in resultados:
         mostrar_paquete(paquete)
