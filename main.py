@@ -4,7 +4,7 @@
 # Grupo 2
 
 from datos    import mostrar_todos_los_paquetes
-from busqueda import buscar_x_destino, buscar_x_precio, buscar_con_cupos
+from busqueda import buscar_x_destino, buscar_x_precio, buscar_con_cupos, buscar_x_fecha
 
 SEPARADOR = "=" * 5
 
@@ -28,6 +28,7 @@ def mostrar_menu():
     print("  2. Buscar por destino")
     print("  3. Buscar por precio máximo")
     print("  4. Ver paquetes con cupos disponibles")
+    print("  5. Buscar por fecha de salida")
     print("  0. Salir")
 
 
@@ -50,11 +51,24 @@ while opcion != "0":
         buscar_x_destino(destino)
 
     elif opcion == "3":
-        precio = float(input("Ingrese precio: "))
-        buscar_x_precio(precio)
+        precio = input("Ingrese precio: ").strip()
+        if not precio.isdigit():
+            print(" El precio debe ser un numero valido. ")
+        else:
+            buscar_x_precio(float(precio))
 
     elif opcion == "4":
         buscar_con_cupos()
+        
+    elif opcion == "5":
+        dia = input("Ingrese el dia: ").strip()
+        mes = input("Ingrese el mes: ").strip()
+        año = input("Ingrese el año: ").strip()
+        
+        if not dia.isdigit() or not mes.isdigit() or not año.isdigit():
+            print(" Los valores deben ser numericos. ")
+        else:
+            buscar_x_fecha(int(dia), int(mes), int(año))
 
     elif opcion != "0":
         print("  Opción inválida, intente nuevamente: ")
