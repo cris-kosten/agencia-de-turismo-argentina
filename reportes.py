@@ -57,7 +57,6 @@ def reporte_promedio_de_precios():
 
 def reporte_cupos_totales():
     # Muestra un resumen de los cupos totales y disponibles de cada paquete. Tambien suma y muestra el total general de cupos ofrecidos por la agencia.
-    print("ENTRAMOS A LA FUNCION")
     if len(paquetes) == 0:
         print("No hay paquetes cargados.")
         return

@@ -54,7 +54,7 @@ def buscar_x_precio(precio_maximo):
     resultados = list(filter(lambda paquete: paquete[IDX_PRECIO] <= precio_maximo, paquetes))
 
     if len(resultados) == 0:
-        print(f"No hay paquetes disponibles a partir del precio ${precio_maximo:.2f}")
+        print(f"No hay paquetes disponibles hasta ${precio_maximo:.2f}")
         return
 
     print(f"\n{SEPARADOR} PAQUETES HASTA ${precio_maximo:.2f} {SEPARADOR}")
