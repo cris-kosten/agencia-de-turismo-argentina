@@ -31,11 +31,6 @@ def reporte_paquete_mas_caro_y_mas_barato():
 
 
 def reporte_cupos_totales():
-    '''
-    Muestra el resumen de cupos disponibles y totales por paquete. 
-    Suma y muestra el total general
-    '''
-    print("ENTRAMOS A LA FUNCION")
     if len(paquetes) == 0:
         print("No hay paquetes cargados.")
         return
