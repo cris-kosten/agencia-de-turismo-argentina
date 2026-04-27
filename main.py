@@ -6,6 +6,8 @@
 from datos    import mostrar_todos_los_paquetes
 from busqueda import buscar_x_destino, buscar_x_precio, buscar_con_cupos, buscar_x_fecha
 from reportes import reporte_paquete_mas_caro_y_mas_barato, reporte_promedio_de_precios, reporte_cupos_totales
+from reserva  import realizar_reserva,ver_todas_las_reservas
+
 
 SEPARADOR = "=" * 5
 
@@ -25,6 +27,7 @@ def mostrar_menu():
     Muestra las opciones disponibles del menú principal.
     '''
     print("\n", SEPARADOR, "MENÚ PRINCIPAL", SEPARADOR)
+    print("  --- Paquetes ---")
     print("  1. Ver todos los paquetes")
     print("  2. Buscar por destino")
     print("  3. Buscar por precio máximo")
@@ -33,6 +36,9 @@ def mostrar_menu():
     print("  6. Paquete mas economico y mas caro.")
     print("  7. Promedio de precios.")
     print("  8. Resumen de cupos ")
+    print("  --- Reservas ---")
+    print("  9. Realizar una reserva")
+    print("  10. Ver todas las reservas")
     print("  0. Salir")
 
 
@@ -82,6 +88,12 @@ while opcion != "0":
 
     elif opcion == "8":
         reporte_cupos_totales()
+
+    elif opcion == "9":
+        realizar_reserva()
+
+    elif opcion == "10":
+        ver_todas_las_reservas()
 
     elif opcion != "0":
         print("  Opción inválida, intente nuevamente: ")
