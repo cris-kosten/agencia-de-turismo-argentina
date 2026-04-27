@@ -123,3 +123,41 @@ def ver_todas_las_reservas():
         mostrar_reserva(reserva)
     print("-" * 50)
     print("  Total de reservas: %d" % len(reservas))
+
+def cancelar_reserva():
+    '''
+    cancelar una reserva existente
+    '''
+    print("\n%s CANCELAR RESERVA %s" % (SEPARADOR, SEPARADOR))
+    
+    if len(reservas) == 0:
+        print(" No se encontraron reservas registradas")
+        return
+    
+    id_reserva = input("Ingrese el ID de la reserva a cancelar (ej: R001): ").strip().upper()
+    
+    resultados = [reserva for reserva in reservas if reserva[0] == id_reserva]
+    
+    if len(resultados) >0:
+        reserva_encontrada = resultados[0]
+    else:
+        reserva_encontrada = None
+        
+    if reserva_encontrada is None:
+        print("No existe una reserva con el ID '%s'." % id_reserva)
+        return
+    
+    print("\n Reserva encontrada: ")
+    mostrar_reserva(reserva_encontrada)
+    
+    confirmacion = input("\n ¿Desea confirmar su cancelacion? (S/N): ").strip().lower()
+    if confirmacion != "s":
+        print("La reserva no ha sido cancelada ")
+        return
+    
+    paquete = buscar_paquete_por_id(reserva_encontrada[1])
+    if paquete:
+        paquete[IDX_CUPOS_DISP] += reserva_encontrada[4]
+        
+    reservas.remove(reserva_encontrada)
+    print(" Reserva %s cancelada exitosamente" % id_reserva)

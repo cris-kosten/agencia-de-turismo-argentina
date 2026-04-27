@@ -40,28 +40,6 @@ def buscar_x_destino(destino_a_buscar):
         mostrar_paquete(paquete)
         
 
-
-def buscar_x_precio(precio_maximo):
-    '''
-    Busca paquetes cuyo precio sea menor o igual al precio maximo
-    Se valida que el precio no sea negativo.
-    Muestra los resultados por pantalla y/o avisa si no encuentra nada
-    '''
-    if precio_maximo < 0:
-        print("El precio ingresado es negativo .")
-        return 
-    
-    resultados = list(filter(lambda paquete: paquete[IDX_PRECIO] <= precio_maximo, paquetes))
-
-    if len(resultados) == 0:
-        print(f"No hay paquetes disponibles a partir del precio ${precio_maximo:.2f}")
-        return
-
-    print(f"\n{SEPARADOR} PAQUETES HASTA ${precio_maximo:.2f} {SEPARADOR}")
-    for paquete in resultados:
-        mostrar_paquete(paquete)
-
-
 def convertir_fechas(fecha_srt):
     '''
     convierte una fecha de formato DD/MM/AAAA a AAAA/MM/DD
