@@ -5,6 +5,7 @@
 
 from datos    import mostrar_todos_los_paquetes
 from busqueda import buscar_x_destino, buscar_x_precio, buscar_con_cupos, buscar_x_fecha
+from reportes import reporte_paquete_mas_caro_y_mas_barato, reporte_promedio_de_precios, reporte_cupos_totales
 
 SEPARADOR = "=" * 5
 
@@ -29,6 +30,9 @@ def mostrar_menu():
     print("  3. Buscar por precio máximo")
     print("  4. Ver paquetes con cupos disponibles")
     print("  5. Buscar por fecha de salida")
+    print("  6. Paquete mas economico y mas caro.")
+    print("  7. Promedio de precios.")
+    print("  8. Resumen de cupos ")
     print("  0. Salir")
 
 
@@ -69,6 +73,15 @@ while opcion != "0":
             print(" Los valores deben ser numericos. ")
         else:
             buscar_x_fecha(int(dia), int(mes), int(año))
+
+    elif opcion == "6":
+        reporte_paquete_mas_caro_y_mas_barato()
+    
+    elif opcion == "7":
+        reporte_promedio_de_precios()
+
+    elif opcion == "8":
+        reporte_cupos_totales()
 
     elif opcion != "0":
         print("  Opción inválida, intente nuevamente: ")
