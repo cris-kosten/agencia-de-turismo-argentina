@@ -2,7 +2,7 @@ import json
 from datos import (
     paquetes, reservas, sesion_activa,
     IDX_ID, IDX_DESTINO, IDX_PRECIO,
-    IDX_CUPOS_DISP, IDX_CUPOS_TOT,
+    IDX_CUPOS_DISP,
     mostrar_paquete
 )
 
@@ -135,7 +135,7 @@ def realizar_reserva():
     paquete[IDX_CUPOS_DISP] -= cantidad
     guardar_reservas()
 
-    print(f"\n  ✔ Reserva confirmada exitosamente.")
+    print("\n  Reserva confirmada exitosamente.")
     print(f"  N° de reserva : {id_reserva}")
     print(f"  Se enviará un comprobante a {sesion_activa['email']}")
 

@@ -1,6 +1,5 @@
 import json
-from datetime import date
-from utils import calcular_edad, es_mayor_de_edad
+from utils import calcular_edad
 from datos import sesion_activa
 
 ARCHIVO_USUARIOS = "usuarios.json"
