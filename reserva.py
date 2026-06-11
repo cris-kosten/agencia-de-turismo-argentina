@@ -1,11 +1,39 @@
+import json
 from datos import (
-    paquetes, reservas,
-    IDX_ID, IDX_DESTINO, IDX_PRECIO, IDX_CUPOS_DISP, IDX_CUPOS_TOT,
+    paquetes, reservas, sesion_activa,
+    IDX_ID, IDX_DESTINO, IDX_PRECIO,
+    IDX_CUPOS_DISP, IDX_CUPOS_TOT,
     mostrar_paquete
 )
 
-SEPARADOR = "=" * 5
+ARCHIVO_RESERVAS = "reservas.json"
 
+# ============================================================
+# PERSISTENCIA
+# ============================================================
+
+def cargar_reservas():
+    try:
+        with open(ARCHIVO_RESERVAS, "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+            reservas.extend(datos)
+    except FileNotFoundError:
+        pass
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"  Error al cargar reservas: {e}")
+
+
+def guardar_reservas():
+    try:
+        with open(ARCHIVO_RESERVAS, "w", encoding="utf-8") as archivo:
+            json.dump(reservas, archivo, indent=4)
+    except OSError as e:
+        print(f"  Error al guardar reservas: {e}")
+
+
+# ============================================================
+# FUNCIONES AUXILIARES
+# ============================================================
 
 def generar_id_reserva():
     return "R%03d" % (len(reservas) + 1)
@@ -18,146 +46,171 @@ def buscar_paquete_por_id(id_paquete):
     return None
 
 
-def validar_dni(dni):
-    return dni.isdigit() and 7 <= len(dni) <= 8
+def confirmar_identidad():
+    """
+    Pide la clave al turista para confirmar la operación.
+    Tiene 3 intentos.
+    """
+    intentos = 0
+    while intentos < 3:
+        clave = input("  Ingresá tu contraseña para confirmar: ").strip()
+        if clave == sesion_activa["clave"]:
+            return True
+        intentos += 1
+        restantes = 3 - intentos
+        if restantes > 0:
+            print(f"  Contraseña incorrecta. Intentos restantes: {restantes}")
+    print("  Demasiados intentos fallidos.")
+    return False
 
 
-def validar_cantidad(cantidad_str, cupos_disponibles):
-    if not cantidad_str.isdigit():
-        print("  La cantidad debe ser un número entero positivo.")
-        return None
-    cantidad = int(cantidad_str)
-    if cantidad <= 0:
-        print("  La cantidad debe ser mayor a cero.")
-        return None
-    if cantidad > cupos_disponibles:
-        print("  No hay suficientes cupos. Disponibles: %d" % cupos_disponibles)
-        return None
-    return cantidad
-
+# ============================================================
+# REALIZAR RESERVA
+# ============================================================
 
 def realizar_reserva():
-    print("\n%s NUEVA RESERVA %s" % (SEPARADOR, SEPARADOR))
+    print("\n===== NUEVA RESERVA =====")
 
-    # 1. ID del paquete
-    id_paquete = input("  Ingrese el ID del paquete a reservar (ej: P001): ").strip()
-    paquete = buscar_paquete_por_id(id_paquete)
-    if paquete is None:
-        print("  No existe un paquete con el ID '%s'." % id_paquete)
+    # ── mostrar paquetes disponibles ──
+    disponibles = [p for p in paquetes if p[IDX_CUPOS_DISP] > 0]
+    if not disponibles:
+        print("  No hay paquetes con cupos disponibles.")
         return
 
-    print("\n  Paquete seleccionado:")
-    mostrar_paquete(paquete)
+    for p in disponibles:
+        mostrar_paquete(p)
 
-    if paquete[IDX_CUPOS_DISP] == 0:
-        print("  Lo sentimos, este paquete no tiene cupos disponibles.")
-        return
+    # ── seleccionar paquete ──
+    while True:
+        id_paquete = input("\n  Ingresá el ID del paquete a reservar (ej: P001): ").strip()
+        paquete = buscar_paquete_por_id(id_paquete)
+        if paquete is None:
+            print(f"  No existe un paquete con el ID '{id_paquete}'.")
+        elif paquete[IDX_CUPOS_DISP] == 0:
+            print("  Ese paquete no tiene cupos disponibles.")
+        else:
+            break
 
-    # 2. Nombre del cliente
-    nombre = input("\n  Nombre completo del cliente: ").strip()
-    if nombre == "":
-        print("  El nombre no puede estar vacío.")
-        return
+    # ── cantidad de personas ──
+    while True:
+        cantidad_str = input(f"  Cantidad de personas (cupos disp.: {paquete[IDX_CUPOS_DISP]}): ").strip()
+        if not cantidad_str.isdigit():
+            print("  Ingresá un número válido.")
+        elif int(cantidad_str) <= 0:
+            print("  La cantidad debe ser mayor a cero.")
+        elif int(cantidad_str) > paquete[IDX_CUPOS_DISP]:
+            print(f"  No hay suficientes cupos. Disponibles: {paquete[IDX_CUPOS_DISP]}")
+        else:
+            cantidad = int(cantidad_str)
+            break
 
-    # 3. DNI
-    dni = input("  DNI del cliente: ").strip()
-    if not validar_dni(dni):
-        print("  DNI inválido. Debe tener entre 7 y 8 dígitos numéricos.")
-        return
-
-    # 4. Cantidad de personas
-    cantidad_str = input("  Cantidad de personas (cupos disp.: %d): " % paquete[IDX_CUPOS_DISP]).strip()
-    cantidad = validar_cantidad(cantidad_str, paquete[IDX_CUPOS_DISP])
-    if cantidad is None:
-        return
-
-    # 5. Confirmación
+    # ── resumen ──
     total = paquete[IDX_PRECIO] * cantidad
     print("\n  --- Resumen de la reserva ---")
-    print("  Destino:    %s" % paquete[IDX_DESTINO])
-    print("  Cliente:    %s" % nombre)
-    print("  DNI:        %s" % dni)
-    print("  Personas:   %d" % cantidad)
-    print("  Total:      $%.2f" % total)
+    print(f"  Destino  : {paquete[IDX_DESTINO]}")
+    print(f"  Cliente  : {sesion_activa['nombre']}")
+    print(f"  DNI      : {sesion_activa['dni']}")
+    print(f"  Email    : {sesion_activa['email']}")
+    print(f"  Personas : {cantidad}")
+    print(f"  Total    : ${'%s' % f'{total:,.0f}'.replace(',', '.')}")
 
-    confirmacion = input("\n  ¿Confirmar reserva? (s/n): ").strip().lower()
-    if confirmacion != "s":
+    # ── confirmar con clave ──
+    print("\n  Para confirmar la reserva ingresá tu contraseña.")
+    if not confirmar_identidad():
         print("  Reserva cancelada.")
         return
 
-    # 6. Actualizar cupos y registrar reserva
-    paquete[IDX_CUPOS_DISP] -= cantidad
-
-    id_reserva = generar_id_reserva()
-    nueva_reserva = [id_reserva, paquete[IDX_ID], nombre, dni, cantidad]
+    # ── registrar reserva ──
+    id_reserva  = generar_id_reserva()
+    nueva_reserva = [
+        id_reserva,
+        paquete[IDX_ID],
+        sesion_activa["nombre"],
+        sesion_activa["dni"],
+        sesion_activa["email"],
+        cantidad,
+        total
+    ]
     reservas.append(nueva_reserva)
+    paquete[IDX_CUPOS_DISP] -= cantidad
+    guardar_reservas()
 
-    # 7. Comprobante
-    print("\n  Reserva registrada exitosamente.")
-    print("  ID de reserva: %s" % id_reserva)
-    print("  Cupos restantes para '%s': %d" % (paquete[IDX_DESTINO], paquete[IDX_CUPOS_DISP]))
+    print(f"\n  ✔ Reserva confirmada exitosamente.")
+    print(f"  N° de reserva : {id_reserva}")
+    print(f"  Se enviará un comprobante a {sesion_activa['email']}")
 
+
+# ============================================================
+# VER RESERVAS
+# ============================================================
 
 def mostrar_reserva(reserva):
-    paquete = buscar_paquete_por_id(reserva[1])
-    destino = paquete[IDX_DESTINO] if paquete else "Paquete no encontrado"
-    precio_unit = paquete[IDX_PRECIO] if paquete else 0.0
-
+    paquete     = buscar_paquete_por_id(reserva[1])
+    destino     = paquete[IDX_DESTINO] if paquete else "Paquete no encontrado"
     print("-" * 50)
-    print("ID Reserva:  %s" % reserva[0])
-    print("Paquete:     %s – %s" % (reserva[1], destino))
-    print("Cliente:     %s" % reserva[2])
-    print("DNI:         %s" % reserva[3])
-    print("Personas:    %d" % reserva[4])
-    print("Total:       $%.2f" % (precio_unit * reserva[4]))
+    print(f"  ID Reserva : {reserva[0]}")
+    print(f"  Paquete    : {reserva[1]} — {destino}")
+    print(f"  Cliente    : {reserva[2]}")
+    print(f"  DNI        : {reserva[3]}")
+    print(f"  Email      : {reserva[4]}")
+    print(f"  Personas   : {reserva[5]}")
+    print(f"  Total      : ${'%s' % f'{reserva[6]:,.0f}'.replace(',', '.')}")
 
 
 def ver_todas_las_reservas():
-    print("\n%s RESERVAS REGISTRADAS %s" % (SEPARADOR, SEPARADOR))
+    print("\n===== MIS RESERVAS =====")
 
-    if len(reservas) == 0:
-        print("  No hay reservas registradas.")
+    mis_reservas = [r for r in reservas if r[2] == sesion_activa["nombre"]]
+
+    if not mis_reservas:
+        print("  No tenés reservas registradas.")
         return
 
-    for reserva in reservas:
+    for reserva in mis_reservas:
         mostrar_reserva(reserva)
     print("-" * 50)
-    print("  Total de reservas: %d" % len(reservas))
+    print(f"  Total de reservas: {len(mis_reservas)}")
+
+
+# ============================================================
+# CANCELAR RESERVA
+# ============================================================
 
 def cancelar_reserva():
-    '''
-    cancelar una reserva existente
-    '''
-    print("\n%s CANCELAR RESERVA %s" % (SEPARADOR, SEPARADOR))
-    
-    if len(reservas) == 0:
-        print(" No se encontraron reservas registradas")
+    print("\n===== CANCELAR RESERVA =====")
+
+    mis_reservas = [r for r in reservas if r[2] == sesion_activa["nombre"]]
+
+    if not mis_reservas:
+        print("  No tenés reservas para cancelar.")
         return
-    
-    id_reserva = input("Ingrese el ID de la reserva a cancelar (ej: R001): ").strip().upper()
-    
-    resultados = [reserva for reserva in reservas if reserva[0] == id_reserva]
-    
-    if len(resultados) >0:
-        reserva_encontrada = resultados[0]
-    else:
-        reserva_encontrada = None
-        
-    if reserva_encontrada is None:
-        print("No existe una reserva con el ID '%s'." % id_reserva)
-        return
-    
-    print("\n Reserva encontrada: ")
+
+    for reserva in mis_reservas:
+        mostrar_reserva(reserva)
+
+    while True:
+        id_reserva = input("\n  Ingresá el ID de la reserva a cancelar (ej: R001): ").strip().upper()
+        ids        = [r[0] for r in mis_reservas]
+        if id_reserva not in ids:
+            print(f"  No existe la reserva '{id_reserva}'.")
+        else:
+            break
+
+    reserva_encontrada = mis_reservas[ids.index(id_reserva)]
     mostrar_reserva(reserva_encontrada)
-    
-    confirmacion = input("\n ¿Desea confirmar su cancelacion? (S/N): ").strip().lower()
-    if confirmacion != "s":
-        print("La reserva no ha sido cancelada ")
+
+    print("\n  Para cancelar ingresá tu contraseña.")
+    if not confirmar_identidad():
+        print("  Cancelación abortada.")
         return
-    
+
     paquete = buscar_paquete_por_id(reserva_encontrada[1])
     if paquete:
-        paquete[IDX_CUPOS_DISP] += reserva_encontrada[4]
-        
+        paquete[IDX_CUPOS_DISP] += reserva_encontrada[5]
+
     reservas.remove(reserva_encontrada)
-    print(" Reserva %s cancelada exitosamente" % id_reserva)
+    guardar_reservas()
+    print(f"  ✔ Reserva {id_reserva} cancelada. Cupo devuelto al paquete.")
+
+
+cargar_reservas()

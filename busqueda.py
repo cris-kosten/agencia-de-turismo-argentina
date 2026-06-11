@@ -92,19 +92,3 @@ def buscar_x_fecha(dia, mes, año):
     for paquete in resultados:
         mostrar_paquete(paquete)
 
-def buscar_con_cupos():
-    '''
-    Busca todos los paquetes que tengan al menos un cupo disponible
-    Si no hay paquetes disponibles, da aviso al usuario que los 
-    paquetes estan agotados.
-    '''
-    resultados = [paquete for paquete in paquetes if paquete[IDX_CUPOS_DISP] >0 ]
-
-    if len(resultados) == 0:
-        print("Lo siento, no tenemos paquetes con cupos ")
-        return
-
-    print(f"\n{SEPARADOR} PAQUETES CON CUPOS DISPONIBLES {SEPARADOR}")
-    for paquete in resultados:
-        mostrar_paquete(paquete)
-

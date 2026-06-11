@@ -17,17 +17,24 @@ IDX_CUPOS_TOT   = 6
 IDX_CUPOS_DISP  = 7
 
 paquetes = [
-    ["P001", "Cancún",       "Resort todo incluido",      1500.00,  7, "15/07/2025", 20, 20],
-    ["P002", "París",        "Tour cultural europeo",     2800.00, 10, "20/07/2025", 15, 15],
-    ["P003", "Bariloche",    "Aventura en la Patagonia",   850.00,  5, "10/07/2025", 25, 25],
-    ["P004", "Miami",        "Playa y shopping",          1200.00,  6, "01/08/2025", 18, 18],
-    ["P005", "Machu Picchu", "Ruta inca histórica",        950.00,  8, "05/08/2025", 12, 12],
+    ["P001", "Cancún",       "Resort todo incluido",      1500000,  7, "15/07/2025", 20, 20],
+    ["P002", "París",        "Tour cultural europeo",     2800000, 10, "20/07/2025", 15, 15],
+    ["P003", "Bariloche",    "Aventura en la Patagonia",   910000,  5, "10/07/2025", 25, 25],
+    ["P004", "Miami",        "Playa y shopping",          1200000,  6, "01/08/2025", 18, 18],
+    ["P005", "Machu Picchu", "Ruta inca histórica",        950000,  8, "05/08/2025", 12, 12],
 ]
 
 # Estructura de cada reserva:
 # [ id_reserva, id_paquete, nombre_cliente, dni, cantidad_personas ]
 reservas = []
 
+sesion_activa = {
+    "usuario": "",
+    "nombre":  "",
+    "dni":     "",
+    "email":   "",
+    "clave":   ""
+}
 
 def mostrar_paquete(paquete):
     # Recibe un paquete y muestra todos sus datos por pantalla con formato prolijo
@@ -35,7 +42,7 @@ def mostrar_paquete(paquete):
     print("ID:          %s"    % paquete[IDX_ID])
     print("Destino:     %s"    % paquete[IDX_DESTINO])
     print("Descripción: %s"    % paquete[IDX_DESCRIPCION])
-    print("Precio:      $%.2f" % paquete[IDX_PRECIO])
+    print("Precio:      $%s" % f"{paquete[IDX_PRECIO]:,.0f}".replace(",", "."))
     print("Duración:    %d días" % paquete[IDX_DURACION])
     print("Salida:      %s"    % paquete[IDX_FECHA])
     print("Cupos disp.: %d / %d" % (paquete[IDX_CUPOS_DISP], paquete[IDX_CUPOS_TOT]))
