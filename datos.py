@@ -1,8 +1,3 @@
-# =============================================================
-#   SISTEMA DE BÚSQUEDA Y RESERVA DE PAQUETES TURÍSTICOS
-#   Programación I – Algoritmos y Estructuras de Datos I
-#   Docente: Ricardo Thompson
-# =============================================================
 
 # Estructura de cada paquete:
 # [ id, destino, descripcion, precio, duracion_dias, fecha_salida, cupos_totales, cupos_disponibles ]
