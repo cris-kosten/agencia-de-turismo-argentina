@@ -28,7 +28,8 @@ sesion_activa = {
     "nombre":  "",
     "dni":     "",
     "email":   "",
-    "clave":   ""
+    "clave":   "",
+    "rol":     ""
 }
 
 def mostrar_paquete(paquete):

@@ -3,7 +3,7 @@
 # Docente: Ricardo Thompson
 # Grupo 2
 
-from login  import ejecutar_login
+from login  import ejecutar_login, es_admin, gestionar_roles
 from datos  import mostrar_todos_los_paquetes
 from busqueda import buscar_x_destino, buscar_x_fecha
 from reportes import paquete_al_azar
@@ -77,6 +77,28 @@ def ejecutar_menu():
     print("\n  ¡Hasta pronto! Gracias por usar nuestro sistema.")
 
 
+def menu_admin():
+    # Panel exclusivo para administradores.
+    # Por ahora ofrece la gestion de roles; aca se pueden sumar
+    # mas opciones de admin en el futuro (gestionar paquetes, etc.).
+    salir = False
+    while not salir:
+        print("\n", SEPARADOR, "PANEL DE ADMINISTRADOR", SEPARADOR)
+        print("   1. Gestionar roles (designar / quitar admins)")
+        print("   2. Ir al menu principal de la agencia")
+        print("   0. Salir")
+        opcion = input("   Seleccione una opcion: ").strip()
+
+        if opcion == "1":
+            gestionar_roles()
+        elif opcion == "2":
+            ejecutar_menu()
+        elif opcion == "0":
+            salir = True
+        else:
+            print("   Opcion invalida.")
+
+
 # -----------------------------------------------------------
 # Programa principal
 # -----------------------------------------------------------
@@ -86,4 +108,10 @@ mostrar_bienvenida()
 if not ejecutar_login():
     print("\n  Gracias por visitarnos. ¡Hasta pronto!")
 else:
-    ejecutar_menu()
+    # Redireccion basica segun el rol del usuario logueado.
+    if es_admin():
+        print("\n  Iniciaste sesion como ADMINISTRADOR.")
+        menu_admin()
+    else:
+        print("\n  Iniciaste sesion como CLIENTE.")
+        ejecutar_menu()
