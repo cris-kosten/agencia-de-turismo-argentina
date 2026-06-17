@@ -104,6 +104,34 @@ def realizar_reserva():
             cantidad = int(cantidad_str)
             break
 
+    # ── método de pago y recargos/descuentos ──
+    total_base = paquete[IDX_PRECIO] * cantidad
+    print("\n  --- Métodos de Pago ---")
+    print("  1. Transferencia Bancaria (10% de descuento)")
+    print("  2. Tarjeta de Crédito (15% de recargo)")
+    print("  3. Efectivo (Precio de lista)")
+
+    while True:
+        opcion_pago = input("  Seleccioná un método (1-3): ").strip()
+        if opcion_pago == '1':
+            metodo_pago = "Transferencia"
+            total_final = total_base * 0.90
+            estado_pago = "Pendiente de pago"
+            break
+        elif opcion_pago == '2':
+            metodo_pago = "Tarjeta de Crédito"
+            total_final = total_base * 1.15
+            estado_pago = "Aprobado"
+            break
+        elif opcion_pago == '3':
+            metodo_pago = "Efectivo"
+            total_final = total_base
+            estado_pago = "A pagar en sucursal"
+            break
+        else:
+            print("  Opción inválida. Por favor, ingresá 1, 2 o 3.")
+
+    
     # ── resumen ──
     total = paquete[IDX_PRECIO] * cantidad
     print("\n  --- Resumen de la reserva ---")
@@ -112,7 +140,9 @@ def realizar_reserva():
     print(f"  DNI      : {sesion_activa['dni']}")
     print(f"  Email    : {sesion_activa['email']}")
     print(f"  Personas : {cantidad}")
-    print(f"  Total    : ${'%s' % f'{total:,.0f}'.replace(',', '.')}")
+    print(f"  Subtotal   : ${'%s' % f'{total_base:,.0f}'.replace(',', '.')}")
+    print(f"  Método     : {metodo_pago}")
+    print(f"  Total Final: ${'%s' % f'{total_final:,.0f}'.replace(',', '.')}")
 
     # ── confirmar con clave ──
     print("\n  Para confirmar la reserva ingresá tu contraseña.")
@@ -129,7 +159,9 @@ def realizar_reserva():
         sesion_activa["dni"],
         sesion_activa["email"],
         cantidad,
-        total
+        total_final,  # Modificado para usar el total con recargo/descuento
+        metodo_pago,  # NUEVO
+        estado_pago
     ]
     reservas.append(nueva_reserva)
     paquete[IDX_CUPOS_DISP] -= cantidad
@@ -155,7 +187,11 @@ def mostrar_reserva(reserva):
     print(f"  Email      : {reserva[4]}")
     print(f"  Personas   : {reserva[5]}")
     print(f"  Total      : ${'%s' % f'{reserva[6]:,.0f}'.replace(',', '.')}")
-
+    
+    # Condicional indispensable para que no explote con tus reservas viejas (R001 y R002)
+    if len(reserva) > 7:
+        print(f"  Método Pago: {reserva[7]}")
+        print(f"  Estado     : {reserva[8]}")
 
 def ver_todas_las_reservas():
     print("\n===== MIS RESERVAS =====")
