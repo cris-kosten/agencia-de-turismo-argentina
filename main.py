@@ -7,6 +7,7 @@ from login  import ejecutar_login, es_admin, gestionar_roles, agregar_paquete, g
 from datos  import mostrar_todos_los_paquetes, cargar_paquetes
 from busqueda import buscar_x_destino, buscar_x_fecha
 from reserva  import realizar_reserva, ver_todas_las_reservas, cancelar_reserva
+from reportes import reporte_matricial
 
 SEPARADOR = "=" * 5
 
@@ -80,7 +81,8 @@ def menu_admin():
         print("   1. Gestionar roles (designar / quitar admins)")
         print("   2. Agregar un nuevo paquete")
         print("   3. Gestionar promociones (poner / quitar)")
-        print("   4. Ir al menu principal de la agencia")
+        print("   4. Ver reporte matricial (nacional / internacional)")
+        print("   5. Ir al menu principal de la agencia")
         print("   0. Salir")
         opcion = input("   Seleccione una opcion: ").strip()
 
@@ -91,6 +93,8 @@ def menu_admin():
         elif opcion == "3":
             gestionar_promociones()
         elif opcion == "4":
+            reporte_matricial()
+        elif opcion == "5":
             ejecutar_menu()
         elif opcion == "0":
             salir = True

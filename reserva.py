@@ -8,6 +8,10 @@ from datos import (
 
 ARCHIVO_RESERVAS = "reservas.json"
 
+# Cantidad de campos de una reserva en el formato actual:
+# [ id, id_paquete, nombre, dni, email, cantidad, total, metodo_pago, estado ]
+CAMPOS_RESERVA = 9
+
 # ============================================================
 # PERSISTENCIA
 # ============================================================
@@ -16,11 +20,25 @@ def cargar_reservas():
     try:
         with open(ARCHIVO_RESERVAS, "r", encoding="utf-8") as archivo:
             datos = json.load(archivo)
-            reservas.extend(datos)
     except FileNotFoundError:
-        pass
+        return
     except (OSError, json.JSONDecodeError) as e:
         print(f"  Error al cargar reservas: {e}")
+        return
+
+    # Cargamos solo las reservas con el formato actual y descartamos
+    # cualquier reserva vieja con otra cantidad de campos.
+    hubo_viejas = False
+    for r in datos:
+        if len(r) == CAMPOS_RESERVA:
+            reservas.append(r)
+        else:
+            hubo_viejas = True
+
+    # Si descartamos alguna reserva vieja, reescribimos el archivo ya limpio.
+    if hubo_viejas:
+        print("  (Se eliminaron reservas con formato antiguo.)")
+        guardar_reservas()
 
 
 def guardar_reservas():
@@ -36,7 +54,16 @@ def guardar_reservas():
 # ============================================================
 
 def generar_id_reserva():
-    return "R%03d" % (len(reservas) + 1)
+    # Genera un ID unico tipo "R001" tomando el mayor numero ya usado + 1.
+    # Antes se usaba len(reservas)+1, pero eso repetia IDs al cancelar:
+    # con R001 y R002, si se cancelaba R001 la siguiente volvia a ser R002.
+    # Recorriendo el maximo existente el ID nunca se repite.
+    mayor = 0
+    for reserva in reservas:
+        numero = int(reserva[0][1:])   # saca la "R" inicial y lo pasa a entero
+        if numero > mayor:
+            mayor = numero
+    return "R%03d" % (mayor + 1)
 
 
 def buscar_paquete_por_id(id_paquete):
