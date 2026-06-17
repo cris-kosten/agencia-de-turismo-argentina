@@ -1,14 +1,13 @@
 # MODULO DE BUSQUEDA DE PAQUETES TURISTICOS
+# Las funciones de búsqueda sobre listas se implementan de forma RECURSIVA
 
-from datos import paquetes, IDX_DESTINO, IDX_PRECIO, IDX_FECHA, IDX_CUPOS_DISP
-from datos import mostrar_paquete
-SEPARADOR = "=" *5
-DIAS_POR_MES = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+from datos import (paquetes, mostrar_paquete,
+                   IDX_DESTINO, IDX_PRECIO, IDX_TIPO)
+
+SEPARADOR = "=" * 5
+
 
 def normalizar_texto(texto):
-    '''
-    Convierte un texto a minusculas y remplaza las vocales con tilde por vocales sin tilde.
-    '''
     texto = texto.lower()
     texto = texto.replace("á", "a")
     texto = texto.replace("é", "e")
@@ -18,77 +17,84 @@ def normalizar_texto(texto):
     return texto
 
 
+# ============================================================
+# BÚSQUEDA RECURSIVA POR DESTINO
+# ============================================================
+
+def _buscar_destino_rec(lista, destino_norm, inicio=0):
+    '''
+    Caso base  : llegamos al final → []
+    Caso recursivo: compara el elemento actual y llama al siguiente
+    '''
+    if inicio >= len(lista):
+        return []
+    resultados = _buscar_destino_rec(lista, destino_norm, inicio + 1)
+    if destino_norm in normalizar_texto(lista[inicio][IDX_DESTINO]):
+        resultados = [lista[inicio]] + resultados
+    return resultados
+
+
 def buscar_x_destino(destino_a_buscar):
-    '''
-    Busca paquetes turisticos por nombre del destino.
-    recibe el nombre del destino como string.
-    usamos lower() para no distinguir la busqueda.
-    muestra el resultado o un aviso si no encuentra nada
-    '''
-    
-    resultados = []
-    for paquete in paquetes:
-        if normalizar_texto(destino_a_buscar) in normalizar_texto(paquete[IDX_DESTINO]):
-            resultados.append(paquete)
-            
+    resultados = _buscar_destino_rec(paquetes, normalizar_texto(destino_a_buscar))
     if len(resultados) == 0:
-        print(f"no se encontro el paquete para el destino: {destino_a_buscar}")
+        print(f"  No se encontró ningún paquete para el destino: {destino_a_buscar}")
         return
-    
-    print(f"\n{SEPARADOR} RESULTADO PARA: {destino_a_buscar.upper()} ")
-    for paquete in resultados:
-        mostrar_paquete(paquete)
-        
-
-def convertir_fechas(fecha_srt):
-    '''
-    convierte una fecha de formato DD/MM/AAAA a AAAA/MM/DD
-    para que pueda comparar con el texto.
-    '''
-    partes = fecha_srt.split("/")
-    return partes[2] + partes[1] + partes[0]
-
-def validar_y_convertir_fecha(dia, mes, año):
-    '''
-    recibe dia, mes, año como enteros.
-    valida que el año sea mayor a 2024, el mes entre 1 y 12, y
-    el dia valido segun la cantidad de dias de cada mes.
-    Devuelve el string AAAAMMDD para comparar, o None si la fecha
-    es invalida 
-    '''
-    if año < 2024:
-        print("El año ingresado no es valido ")
-        return None
-    if mes <1 or mes >12:
-        print("El mes ingresado no es valido ")
-        return None
-    if dia <1 or dia > DIAS_POR_MES[mes]:
-        print("El dia ingresado no es valido ")
-        return None
-    return str(año) + str(mes).zfill(2) + str(dia).zfill(2)
-
-
-
-def buscar_x_fecha(dia, mes, año):
-    '''
-    busca por fecha mayor o igual al dato ingresado.
-    valida la fecha y muestra si no encuentra resultados.
-    '''
-    fecha_buscada = validar_y_convertir_fecha(dia, mes, año)
-    if fecha_buscada is None:
-        return
-    
-    resultados = []
-    for paquete in paquetes:
-        if convertir_fechas(paquete[IDX_FECHA]) >= fecha_buscada:
-            resultados.append(paquete)
-    # resultados = list(filter(lambda paquete: paquete[IDX_FECHA] >= fecha_buscada, paquetes))
-
-    if len(resultados) == 0:
-        print(f"No hay paquetes disponibles desde {dia:02d}/{mes:02d}/{año} ")
-        return
-    
-    print(f"\n{SEPARADOR} PAQUETE DESDE {dia:02d}/{mes:02d}/{año} {SEPARADOR}")
+    print(f"\n{SEPARADOR} RESULTADO PARA: {destino_a_buscar.upper()} {SEPARADOR}")
     for paquete in resultados:
         mostrar_paquete(paquete)
 
+
+# ============================================================
+# BÚSQUEDA RECURSIVA POR TIPO (Nacional / Internacional)
+# ============================================================
+
+def _buscar_tipo_rec(lista, tipo_norm, inicio=0):
+    '''
+    Caso base  : fin de lista → []
+    Caso recursivo: compara tipo y avanza al siguiente
+    '''
+    if inicio >= len(lista):
+        return []
+    resultados = _buscar_tipo_rec(lista, tipo_norm, inicio + 1)
+    if tipo_norm in normalizar_texto(lista[inicio][IDX_TIPO]):
+        resultados = [lista[inicio]] + resultados
+    return resultados
+
+
+def buscar_x_tipo(tipo):
+    resultados = _buscar_tipo_rec(paquetes, normalizar_texto(tipo))
+    if len(resultados) == 0:
+        print(f"  No se encontraron paquetes de tipo: {tipo}")
+        return
+    print(f"\n{SEPARADOR} PAQUETES {tipo.upper()} {SEPARADOR}")
+    for paquete in resultados:
+        mostrar_paquete(paquete)
+
+
+# ============================================================
+# BÚSQUEDA RECURSIVA POR PRECIO MÁXIMO
+# ============================================================
+
+def _buscar_precio_rec(lista, precio_max, inicio=0):
+    '''
+    Caso base  : fin de lista → []
+    Caso recursivo: compara precio y avanza
+    '''
+    if inicio >= len(lista):
+        return []
+    resultados = _buscar_precio_rec(lista, precio_max, inicio + 1)
+    if lista[inicio][IDX_PRECIO] <= precio_max:
+        resultados = [lista[inicio]] + resultados
+    return resultados
+
+
+def buscar_x_precio(precio_max):
+    resultados = _buscar_precio_rec(paquetes, precio_max)
+    if len(resultados) == 0:
+        precio_fmt = f"${precio_max:,.0f}".replace(",", ".")
+        print(f"  No hay paquetes con precio igual o menor a {precio_fmt}")
+        return
+    precio_fmt = f"${precio_max:,.0f}".replace(",", ".")
+    print(f"\n{SEPARADOR} PAQUETES HASTA {precio_fmt} POR PERSONA {SEPARADOR}")
+    for paquete in resultados:
+        mostrar_paquete(paquete)
